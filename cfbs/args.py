@@ -1,4 +1,5 @@
 import argparse
+import os
 
 from cfbs import commands
 from cfbs.utils import cache
@@ -15,10 +16,27 @@ def print_help():
     parser.print_help()
 
 
+def get_arg_parser():
+    return _get_arg_parser()
+
+
+def get_man():
+    try:
+        print(os.path.dirname(__file__) + "/cfbs.1")
+        with open(
+            os.path.dirname(__file__) + "/cfbs.1", "r", encoding="utf-8"
+        ) as man_file:
+            man = man_file.read()
+            if man:
+                return man
+    except:
+        raise Exception("No manual page was generated")
+
+
 @cache
 def _get_arg_parser():
     command_list = commands.get_command_names()
-    parser = argparse.ArgumentParser(description="CFEngine Build System.")
+    parser = argparse.ArgumentParser(prog="cfbs", description="CFEngine Build System.")
     parser.add_argument(
         "command",
         metavar="cmd",
@@ -34,6 +52,7 @@ def _get_arg_parser():
         type=str,
         default="warning",
     )
+    parser.add_argument("-M", "--manual", help="Print manual page", action="store_true")
     parser.add_argument(
         "--version", "-V", help="Print version number", action="store_true"
     )
